@@ -1,8 +1,7 @@
 import express from "express";
 import userController from "../controllers/user_controller";
 
-const router = express.Router()
-
+const router = express.Router();
 
 router.get("/user", userController.getUsers);
 
@@ -12,4 +11,4 @@ router.put("/user/:id", userController.updatedUser);
 
 router.delete("/user/:id", userController.deletedUser);
 
-export default router
+export default router;

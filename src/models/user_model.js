@@ -60,5 +60,5 @@ export default {
   getAll,
   addUser,
   updateUser,
-  deleteUser
+  deleteUser,
 };

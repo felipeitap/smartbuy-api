@@ -5,8 +5,6 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/v1",router)
+app.use("/v1", router);
 
-app.listen(3000, () => {
-  console.log("Server Running on Port 3000");
-});
+export default app;
