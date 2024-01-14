@@ -10,6 +10,16 @@ const getAll = async () => {
   }
 };
 
+const getOne = async (id) => {
+  try {
+    const users = await pool.query("SELECT * FROM user_table WHERE user_id = $1",[id] );
+    return users.rows;
+  } catch (error) {
+    console.log(error);
+    return { message: error.message, severity: error.severity };
+  }
+};
+
 const addUser = async (user) => {
   const { type, email, phone, name, address, cnpj } = user;
 
@@ -58,6 +68,7 @@ const deleteUser = async (userId) => {
 
 export default {
   getAll,
+  getOne,
   addUser,
   updateUser,
   deleteUser,
