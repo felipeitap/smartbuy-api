@@ -21,12 +21,13 @@ const getOne = async (id) => {
 };
 
 const addUser = async (user) => {
-  const { type, email, phone, name, address, cnpj } = user;
+  const { type, email, phone, name, address, cnpj, authId } = user;
+  console.log(authId);
 
   try {
     const newUser = await pool.query(
-      "INSERT INTO user_table (tipo_usuario , email, telefone, nome_completo, endereco, cnpj) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [type, email, phone, name, address, cnpj]
+      "INSERT INTO user_table (tipo_usuario , email, telefone, nome_completo, endereco, cnpj, auth_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [type, email, phone, name, address, cnpj, authId]
     );
 
     return newUser.rows[0];

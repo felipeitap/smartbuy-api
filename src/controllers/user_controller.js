@@ -24,17 +24,6 @@ const getUser = async (req, res) => {
   }
 };
 
-const newUser = async (req, res) => {
-  const newUser = await userModel.addUser(req.body);
-
-  if (!newUser.severity) {
-    res
-      .status(201)
-      .json({ data: newUser, message: "User created successfully " });
-  } else {
-    res.status(500).json({ error: newUser.message });
-  }
-};
 
 const updatedUser = async (req, res) => {
   const { id } = req.params;
@@ -71,7 +60,6 @@ const deletedUser = async (req, res) => {
 export default {
   getUsers,
   getUser,
-  newUser,
   updatedUser,
   deletedUser,
 };
