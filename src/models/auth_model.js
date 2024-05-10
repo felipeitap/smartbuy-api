@@ -28,7 +28,15 @@ const getHash = async (auth) => {
 const addAuth = async (auth) => {
   const { username, password } = auth;
 
+ 
+
   try {
+    const existingUser = await pool.query("SELECT * FROM  auth_table WHERE username = $1", [username])
+
+    if(existingUser.rows.length > 0 ){
+      throw new Error("User alredy exists")
+    }
+
     const newAuth = await pool.query(
       "INSERT INTO auth_table (username, password_hash) VALUES ($1, $2) RETURNING *",
       [username, password]
