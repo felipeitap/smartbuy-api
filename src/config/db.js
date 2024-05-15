@@ -10,6 +10,8 @@ const pool = new Pool({
   port: 5432,
 });
 
+const createExtension = 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+
 const createUserTableQuery = `
 CREATE TABLE IF NOT EXISTS users_table (
     user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -37,6 +39,7 @@ async function createTables() {
   try {
     const client = await pool.connect();
 
+    await client.query(createExtension);
     await client.query(createAuthTableQuey);
     await client.query(createUserTableQuery);
 
