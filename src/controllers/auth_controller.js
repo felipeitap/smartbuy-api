@@ -8,13 +8,18 @@ const login = async (req, res) => {
   const hash = await authModel.getHash(req.body);
 
   if (!hash.severity) {
-    bcrypt.compare(password, hash, (err, result) => {
+    bcrypt.compare(password, hash, async (err, result) => {
       if (err) {
         res.status(500).json({ error: err });
       }
 
       if (result) {
-        const token = genereateToken({ username });
+        const auth = await authModel.getOneByUserName(username)
+        const user = await userModel.getOneFromAuth(auth.id)
+        const userType = user.tipo_usuario
+
+      
+        const token = genereateToken({ username, userType });
         res.status(200).json({ message: "Login successful", token });
       } else {
         res.status(400).json({ message: "Wrong password" });

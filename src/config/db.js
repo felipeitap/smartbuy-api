@@ -35,6 +35,15 @@ CREATE TABLE IF NOT EXISTS auth_table (
 );
 `;
 
+const createProductQuery = `CREATE TABLE products (
+  product_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  product_name VARCHAR(255) NOT NULL,
+  product_description VARCHAR(255),
+  product_category VARCHAR(100),
+  user_id_created UUID NOT NULL,
+  FOREIGN KEY (user_id_created) REFERENCES users_table(user_id)
+);`
+
 async function createTables() {
   try {
     const client = await pool.connect();

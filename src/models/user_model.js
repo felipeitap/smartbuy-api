@@ -12,8 +12,28 @@ const getAll = async () => {
 
 const getOne = async (id) => {
   try {
-    const users = await pool.query("SELECT * FROM users_table WHERE user_id = $1",[id] );
+    const users = await pool.query(
+      "SELECT * FROM users_table WHERE user_id = $1",
+      [id]
+    );
     return users.rows;
+  } catch (error) {
+    console.log(error);
+    return { message: error.message, severity: error.severity };
+  }
+};
+
+const getOneFromAuth = async (authId) => {
+  try {
+    const user = await pool.query(
+      `SELECT *
+    FROM users_table
+    INNER JOIN auth_table ON users_table.auth_id = auth_table.id
+    WHERE auth_table.id = $1;`,
+      [authId]
+    );
+
+    return user.rows[0];
   } catch (error) {
     console.log(error);
     return { message: error.message, severity: error.severity };
@@ -69,6 +89,7 @@ const deleteUser = async (userId) => {
 export default {
   getAll,
   getOne,
+  getOneFromAuth,
   addUser,
   updateUser,
   deleteUser,

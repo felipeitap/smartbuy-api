@@ -10,6 +10,17 @@ const getAll = async () => {
   }
 };
 
+const getOneByUserName = async (username) => {
+  try {
+    const auth = await pool.query("SELECT * FROM auth_table WHERE username = $1",[username] );
+    
+    return auth.rows[0]
+  } catch (error) {
+    console.log(error);
+    return { message: error.message, severity: error.severity };
+  }
+};
+
 const getHash = async (auth) => {
   const { username } = auth;
 
@@ -27,8 +38,6 @@ const getHash = async (auth) => {
 
 const addAuth = async (auth) => {
   const { username, password } = auth;
-
- 
 
   try {
     const existingUser = await pool.query("SELECT * FROM  auth_table WHERE username = $1", [username])
@@ -52,4 +61,5 @@ export default {
   getAll,
   getHash,
   addAuth,
+  getOneByUserName
 };
