@@ -9,7 +9,10 @@ const autenticateToken = (req, res, next) => {
 
   try {
     const token = authorization.split(" ")[1];
-    verifyToken(token);
+    const verifedToken = verifyToken(token);
+
+    req.userType = verifedToken.userType;
+
     next();
   } catch (error) {
     console.error(error);

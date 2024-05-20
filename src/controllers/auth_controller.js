@@ -14,12 +14,12 @@ const login = async (req, res) => {
       }
 
       if (result) {
-        const auth = await authModel.getOneByUserName(username)
-        const user = await userModel.getOneFromAuth(auth.id)
-        const userType = user.tipo_usuario
+        const auth = await authModel.getOneByUserName(username);
+        const user = await userModel.getOneFromAuth(auth.id);
+        const userType = user.tipo_usuario;
+        const userId = user.id;
 
-      
-        const token = genereateToken({ username, userType });
+        const token = genereateToken({ userId, userType });
         res.status(200).json({ message: "Login successful", token });
       } else {
         res.status(400).json({ message: "Wrong password" });

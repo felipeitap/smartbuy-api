@@ -2,6 +2,7 @@ import userModel from "../models/user_model";
 
 const getUsers = async (req, res) => {
   const users = await userModel.getAll();
+
   if (!users.severity) {
     res.status(200).json({ data: users });
   } else {
