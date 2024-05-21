@@ -35,11 +35,12 @@ CREATE TABLE IF NOT EXISTS auth_table (
 );
 `;
 
-const createProductQuery = `CREATE TABLE products (
+const createProductQuery = `CREATE TABLE IF NOT EXISTS products (
   product_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   product_name VARCHAR(255) NOT NULL,
   product_description VARCHAR(255),
   product_category VARCHAR(100),
+  active BOOLEAN DEFAULT TRUE,
   user_id_created UUID NOT NULL,
   FOREIGN KEY (user_id_created) REFERENCES users_table(user_id)
 );`
@@ -51,6 +52,7 @@ async function createTables() {
     await client.query(createExtension);
     await client.query(createAuthTableQuey);
     await client.query(createUserTableQuery);
+    await client.query(createProductQuery);
 
     client.release();
   } catch (error) {
