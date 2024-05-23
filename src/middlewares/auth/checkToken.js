@@ -12,7 +12,7 @@ const autenticateToken = (req, res, next) => {
     const verifedToken = verifyToken(token);
 
     req.userType = verifedToken.userType;
-
+    req.userId = verifedToken.userId
     next();
   } catch (error) {
     console.error(error);

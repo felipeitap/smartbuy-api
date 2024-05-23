@@ -3,7 +3,7 @@ import pool from "../config/db";
 const getAll = async () => {
   try {
     const products = await pool.query("SELECT * FROM products");
-    return products.rows;
+        return products.rows;
   } catch (error) {
     console.log(error);
     return { message: error.message, severity: error.severity };
@@ -11,7 +11,7 @@ const getAll = async () => {
 };
 
 const getOne = async (id) => {
-  try {
+    try {
     const prodcut = await pool.query(
       "SELECT * FROM products WHERE product_id = $1",
       [id]
@@ -23,12 +23,12 @@ const getOne = async (id) => {
   }
 };
 
-const addProduct = async (prodcut) => {
-  const { name, description, category, userId } = prodcut;
+const addProduct = async (prodcut, userId) => {
+  const { name, description, category } = prodcut;
 
   try {
     const newProduct = await pool.query(
-      "INSERT INTO products (product_name , porduct_description, product_category, user_id_created) VALUES ($1, $2, $3, $4) RETURNING *",
+      "INSERT INTO products (product_name , product_description, product_category, user_id_created) VALUES ($1, $2, $3, $4) RETURNING *",
       [name, description, category, userId]
     );
 
@@ -39,7 +39,7 @@ const addProduct = async (prodcut) => {
   }
 };
 
-const updatdProduct = async (prodcutId, prodcut) => {
+const updateProduct = async (prodcutId, prodcut) => {
   const { name, description, category, userId } = prodcut;
 
   try {
@@ -73,6 +73,6 @@ export default {
   getAll,
   getOne,
   addProduct,
-  updatdProduct,
+  updateProduct,
   deleteProduct,
 };

@@ -16,8 +16,9 @@ const login = async (req, res) => {
       if (result) {
         const auth = await authModel.getOneByUserName(username);
         const user = await userModel.getOneFromAuth(auth.id);
+        
         const userType = user.tipo_usuario;
-        const userId = user.id;
+        const userId = user.user_id;
 
         const token = genereateToken({ userId, userType });
         res.status(200).json({ message: "Login successful", token });
