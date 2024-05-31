@@ -10,7 +10,7 @@ const pool = new Pool({
   port: 5432,
 });
 
-const createExtension = 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+const createExtension = 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";';
 
 const createUserTableQuery = `
 CREATE TABLE IF NOT EXISTS users_table (
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users_table (
 )
 `;
 
-const createAuthTableQuey = `
+const createAuthTableQuery = `
 CREATE TABLE IF NOT EXISTS auth_table (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   username VARCHAR(255) NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS auth_table (
 );
 `;
 
-const createProductQuery = `CREATE TABLE IF NOT EXISTS products (
+const createProductTableQuery = `CREATE TABLE IF NOT EXISTS products (
   product_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   product_name VARCHAR(255) NOT NULL,
   product_description VARCHAR(255),
@@ -43,20 +43,48 @@ const createProductQuery = `CREATE TABLE IF NOT EXISTS products (
   active BOOLEAN DEFAULT TRUE,
   user_id_created UUID NOT NULL,
   FOREIGN KEY (user_id_created) REFERENCES users_table(user_id)
-);`
+);`;
+
+const createProductAlertTableQuery = `CREATE TABLE IF NOT EXISTS  product_alerts (
+  alert_id UUID PRIMARY KEY,
+  product_id UUID NOT NULL,
+  quantity_needed INTEGER NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status TEXT CHECK (status IN ('pendente', 'concluído')) DEFAULT 'pendente',
+  user_id_created UUID NOT NULL,
+  user_id_assigned UUID,
+  FOREIGN KEY (product_id) REFERENCES products(product_id),
+  FOREIGN KEY (user_id_created) REFERENCES users_table(user_id),
+  FOREIGN KEY (user_id_assigned) REFERENCES users_table(user_id)
+);`;
+
+const createBidTableQuery = `CREATE TABLE IF NOT EXISTS bids (
+  bid_id UUID PRIMARY KEY,
+  alert_id UUID NOT NULL,
+  user_id UUID NOT NULL,
+  bid_amount DECIMAL NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status TEXT CHECK (status IN ('pendente', 'aceito', 'rejeitado')) DEFAULT 'pendente',
+  FOREIGN KEY (alert_id) REFERENCES product_alerts(alert_id),
+  FOREIGN KEY (user_id) REFERENCES users_table(user_id)
+);`;
 
 async function createTables() {
+  const client = await pool.connect();
+  
   try {
-    const client = await pool.connect();
-
     await client.query(createExtension);
-    await client.query(createAuthTableQuey);
+    await client.query(createAuthTableQuery);
     await client.query(createUserTableQuery);
-    await client.query(createProductQuery);
-
-    client.release();
+    await client.query(createProductTableQuery);
+    await client.query(createProductAlertTableQuery);
+    await client.query(createBidTableQuery);
   } catch (error) {
-    console.error("Error during tables creation:", error);
+    throw new Error("Error during tables creation:", error);
+  } finally {
+    client.release();
   }
 }
 
@@ -66,6 +94,7 @@ createTables()
   })
   .catch((error) => {
     console.error(error);
+    process.exit(1);
   });
 
 export default pool;
