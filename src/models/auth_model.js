@@ -29,10 +29,15 @@ const getHash = async (auth) => {
       "SELECT password_hash FROM auth_table WHERE username = $1",
       [username]
     );
-    return hash.rows[0].password_hash;
+
+    if(hash.rows.length > 0){
+      return hash.rows[0].password_hash;
+    }else{
+      throw new Error("User not found or password not corretct")
+    }
   } catch (error) {
     console.log(error);
-    return { message: error.message, severity: error.severity };
+    return { error: error.message };
   }
 };
 

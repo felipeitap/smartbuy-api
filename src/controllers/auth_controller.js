@@ -7,10 +7,11 @@ const login = async (req, res) => {
   const { password, username } = req.body;
   const hash = await authModel.getHash(req.body);
 
-  if (!hash.severity) {
+
+  if (!hash.error) {
     bcrypt.compare(password, hash, async (err, result) => {
       if (err) {
-        res.status(500).json({ error: err });
+        res.status(400).json({ error: "Erro durante o compare" });
       }
 
       if (result) {
@@ -23,11 +24,11 @@ const login = async (req, res) => {
         const token = genereateToken({ userId, userType });
         res.status(200).json({ message: "Login successful", token });
       } else {
-        res.status(400).json({ message: "Wrong password" });
+        res.status(400).json({ error: "Wrong password" });
       }
     });
   } else {
-    res.status(500).json({ error: hash.message });
+    res.status(400).json({ error: hash.error });
   }
 };
 

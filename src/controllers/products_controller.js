@@ -42,8 +42,11 @@ const addProducts = async (req, res) => {
   if (req.userType === "cliente") {
     try {
       const products = await productModel.addProduct(req.body, req.userId);
-
-      res.status(200).json({ data: products });
+      if(!products.severity){
+        res.status(200).json({ data: products });
+      } else{
+        throw new Error(products.message)
+      }
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
