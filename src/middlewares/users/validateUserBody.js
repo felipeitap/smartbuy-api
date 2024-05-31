@@ -1,5 +1,6 @@
 const validateBody = (req, res, next) => {
-  const { type, email, phone, name, address, cnpj } = req.body;
+  const { type, email, phone, name, address, cnpj, username, password } =
+    req.body;
 
   if (!type) {
     res.status(400).json({ error: "Type is a required field" });
@@ -13,6 +14,10 @@ const validateBody = (req, res, next) => {
     res.status(400).json({ error: "Address is a required field" });
   } else if (!cnpj) {
     res.status(400).json({ error: "Cnpj is a required field" });
+  } else if (!username) {
+    res.status(400).json({ error: "Username is a required field" });
+  } else if (!password) {
+    res.status(400).json({ error: "Password is a required field" });
   } else {
     next();
   }
