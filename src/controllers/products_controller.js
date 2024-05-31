@@ -42,10 +42,10 @@ const addProducts = async (req, res) => {
   if (req.userType === "cliente") {
     try {
       const products = await productModel.addProduct(req.body, req.userId);
-      if(!products.severity){
+      if (!products.severity) {
         res.status(200).json({ data: products });
-      } else{
-        throw new Error(products.message)
+      } else {
+        throw new Error(products.message);
       }
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -64,7 +64,15 @@ const updateProduct = async (req, res) => {
         throw new Error("Id is required");
       }
 
-      const updatedProduct = await productModel.updateProduct(id, req.body);
+      const updatedProduct = await productModel.updateProduct(
+        id,
+        req.body,
+        req.userId
+      );
+
+      if (updatedProduct.error) {
+        throw new Error(updatedProduct.error);
+      }
       res.status(200).json({
         data: updatedProduct,
         message: "Product updated successfully",
@@ -79,7 +87,7 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   if (req.userType === "cliente") {
-    const { id } = req.body;
+    const { id } = req.params;
 
     try {
       if (!id) {
@@ -87,6 +95,11 @@ const deleteProduct = async (req, res) => {
       }
 
       await productModel.deleteProduct(id);
+
+      if(productModel.error){
+        throw new Error(productModel.error);
+      }
+
       res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
       res.status(500).json({ error: error.message });

@@ -6,7 +6,7 @@ const getAll = async () => {
         return products.rows;
   } catch (error) {
     console.log(error);
-    return { message: error.message, severity: error.severity };
+    return { error: error.message, severity: error.severity };
   }
 };
 
@@ -19,7 +19,7 @@ const getOne = async (id) => {
     return prodcut.rows;
   } catch (error) {
     console.log(error);
-    return { message: error.message, severity: error.severity };
+    return { error: error.message, severity: error.severity };
   }
 };
 
@@ -35,23 +35,23 @@ const addProduct = async (prodcut, userId) => {
     return newProduct.rows[0];
   } catch (error) {
     console.log(error);
-    return { message: error.message, severity: error.severity };
+    return { error: error.message, severity: error.severity };
   }
 };
 
-const updateProduct = async (prodcutId, prodcut) => {
-  const { name, description, category, userId } = prodcut;
+const updateProduct = async (prodcutId, prodcut, userId) => {
+  const { name, description, category } = prodcut;
 
   try {
     const updatedProduct = await pool.query(
-      "UPDATE products SET product_name = $1 , porduct_description = $2, product_category = $3, user_id_created = $4 WHERE product_id = $5 RETURNING *",
+      "UPDATE products SET product_name = $1 , product_description = $2, product_category = $3, user_id_created = $4, active=TRUE WHERE product_id = $5 RETURNING *",
       [name, description, category, userId, prodcutId]
     );
 
     return updatedProduct.rows[0];
   } catch (error) {
     console.log(error);
-    return { message: error.message, severity: error.severity };
+    return { error: error.message, severity: error.severity };
   }
 };
 
@@ -65,7 +65,7 @@ const deleteProduct = async (productId) => {
     return deletedProduct.rows[0];
   } catch (error) {
     console.log(error);
-    return { message: error.message, severity: error.severity };
+    return { error: error.message, severity: error.severity };
   }
 };
 
