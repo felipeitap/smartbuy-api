@@ -1,11 +1,11 @@
-import productModel from "../models/product_model";
+import productAlertModel from "../models/product_alert_model";
 
-const getProducts = async (req, res) => {
+const getProductAlerts = async (req, res) => {
   if (req.userType === "cliente") {
     try {
-      const products = await productModel.getAll();
+      const productsAlert = await productAlertModel.getAll();
 
-      res.status(200).json({ data: products });
+      res.status(200).json({ data: productsAlert });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -14,7 +14,7 @@ const getProducts = async (req, res) => {
   }
 };
 
-const getProduct = async (req, res) => {
+const getProductAlert = async (req, res) => {
   if (req.userType === "cliente") {
     const { id } = req.params;
 
@@ -23,12 +23,12 @@ const getProduct = async (req, res) => {
         throw new Error("Id is required");
       }
 
-      const product = await productModel.getOne(id);
+      const productAlert = await productAlertModel.getOne(id);
 
-      if (product) {
-        res.status(200).json({ data: product });
+      if (productAlert) {
+        res.status(200).json({ data: productAlert });
       } else {
-        res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "Product Alert not found" });
       }
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -38,14 +38,18 @@ const getProduct = async (req, res) => {
   }
 };
 
-const addProducts = async (req, res) => {
+const addProductAlert = async (req, res) => {
   if (req.userType === "cliente") {
     try {
-      const products = await productModel.addProduct(req.body, req.userId);
-      if (!products.severity) {
-        res.status(200).json({ data: products });
+      const productAlert = await productAlertModel.addProductAlert(
+        req.body,
+        req.userId
+      );
+
+      if (!productAlert.error) {
+        res.status(200).json({ data: productAlert });
       } else {
-        throw new Error(products.message);
+        throw new Error(productAlert.error);
       }
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -55,7 +59,7 @@ const addProducts = async (req, res) => {
   }
 };
 
-const updateProduct = async (req, res) => {
+const updateProductAlert = async (req, res) => {
   if (req.userType === "cliente") {
     const { id } = req.params;
 
@@ -64,18 +68,19 @@ const updateProduct = async (req, res) => {
         throw new Error("Id is required");
       }
 
-      const updatedProduct = await productModel.updateProduct(
+      const updatedProductAlert = await productAlertModel.updateProductAlert(
         id,
         req.body,
         req.userId
       );
 
-      if (updatedProduct.error) {
-        throw new Error(updatedProduct.error);
+
+      if (updatedProductAlert.error) {
+        throw new Error(updatedProductAlert.error);
       }
       res.status(200).json({
-        data: updatedProduct,
-        message: "Product updated successfully",
+        data: updatedProductAlert,
+        message: "Product Alert updated successfully",
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -85,7 +90,7 @@ const updateProduct = async (req, res) => {
   }
 };
 
-const deleteProduct = async (req, res) => {
+const deleteProductAlert = async (req, res) => {
   if (req.userType === "cliente") {
     const { id } = req.params;
 
@@ -94,13 +99,13 @@ const deleteProduct = async (req, res) => {
         throw new Error("Id is required");
       }
 
-      const deletedProduct = await productModel.deleteProduct(id);
+      const deletedAlert = await productAlertModel.deleteProductAlert(id);
 
-      if(deletedProduct.error){
-        throw new Error(deletedProduct.error);
+      if (deletedAlert.error) {
+        throw new Error(deletedAlert.error);
       }
 
-      res.status(200).json({ message: "Product deleted successfully" });
+      res.status(200).json({ message: "Product Alert deleted successfully" });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -110,9 +115,9 @@ const deleteProduct = async (req, res) => {
 };
 
 export default {
-  getProducts,
-  getProduct,
-  addProducts,
-  updateProduct,
-  deleteProduct,
+  getProductAlerts,
+  getProductAlert,
+  addProductAlert,
+  updateProductAlert,
+  deleteProductAlert,
 };

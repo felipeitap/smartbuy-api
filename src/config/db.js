@@ -46,13 +46,14 @@ const createProductTableQuery = `CREATE TABLE IF NOT EXISTS products (
 );`;
 
 const createProductAlertTableQuery = `CREATE TABLE IF NOT EXISTS  product_alerts (
-  alert_id UUID PRIMARY KEY,
+  alert_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   product_id UUID NOT NULL,
   quantity_needed INTEGER NOT NULL,
   description TEXT,
+  negotiation_deadline TIMESTAMP NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  status TEXT CHECK (status IN ('pendente', 'concluído')) DEFAULT 'pendente',
+  status TEXT CHECK (status IN ('pendente', 'concluído', 'cancelado')) DEFAULT 'pendente',
   user_id_created UUID NOT NULL,
   user_id_assigned UUID,
   FOREIGN KEY (product_id) REFERENCES products(product_id),
@@ -61,7 +62,7 @@ const createProductAlertTableQuery = `CREATE TABLE IF NOT EXISTS  product_alerts
 );`;
 
 const createBidTableQuery = `CREATE TABLE IF NOT EXISTS bids (
-  bid_id UUID PRIMARY KEY,
+  bid_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   alert_id UUID NOT NULL,
   user_id UUID NOT NULL,
   bid_amount DECIMAL NOT NULL,
