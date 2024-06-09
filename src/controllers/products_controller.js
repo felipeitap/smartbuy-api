@@ -3,7 +3,7 @@ import productModel from "../models/product_model";
 const getProducts = async (req, res) => {
   if (req.userType === "cliente") {
     try {
-      const products = await productModel.getAll();
+      const products = await productModel.getAll(req.userId);
 
       res.status(200).json({ data: products });
     } catch (error) {

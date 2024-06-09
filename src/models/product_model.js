@@ -1,8 +1,8 @@
 import pool from "../config/db";
 
-const getAll = async () => {
+const getAll = async (id) => {
   try {
-    const products = await pool.query("SELECT * FROM products");
+    const products = await pool.query("SELECT * FROM products WHERE user_id_created = $1",[id]);
         return products.rows;
   } catch (error) {
     console.log(error);

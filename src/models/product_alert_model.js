@@ -2,8 +2,8 @@ import pool from "../config/db";
 
 const getAll = async () => {
   try {
-    const products = await pool.query("SELECT * FROM product_alerts");
-    return products.rows;
+    const productAlerts = await pool.query("SELECT pa.*, p.product_name FROM product_alerts pa JOIN products p ON p.product_id = pa.product_Id");
+    return productAlerts.rows;
   } catch (error) {
     console.log(error);
     return { error: error.message, severity: error.severity };
@@ -12,11 +12,11 @@ const getAll = async () => {
 
 const getOne = async (id) => {
   try {
-    const prodcut = await pool.query(
-      "SELECT * FROM product_alerts WHERE alert_id = $1",
+    const prodcutAlert = await pool.query(
+      "SELECT pa.*, p.product_name FROM product_alerts pa JOIN products p ON p.product_id = pa.product_Id WHERE alert_id = $1",
       [id]
     );
-    return prodcut.rows;
+    return prodcutAlert.rows;
   } catch (error) {
     console.log(error);
     return { error: error.message, severity: error.severity };

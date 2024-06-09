@@ -1,16 +1,12 @@
 import productAlertModel from "../models/product_alert_model";
 
 const getProductAlerts = async (req, res) => {
-  if (req.userType === "cliente") {
-    try {
-      const productsAlert = await productAlertModel.getAll();
+  try {
+    const productsAlert = await productAlertModel.getAll();
 
-      res.status(200).json({ data: productsAlert });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  } else {
-    res.status(403).json({ message: "Not authorized" });
+    res.status(200).json({ data: productsAlert });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -73,7 +69,6 @@ const updateProductAlert = async (req, res) => {
         req.body,
         req.userId
       );
-
 
       if (updatedProductAlert.error) {
         throw new Error(updatedProductAlert.error);
