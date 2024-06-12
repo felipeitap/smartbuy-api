@@ -67,7 +67,7 @@ const createBidTableQuery = `CREATE TABLE IF NOT EXISTS bids (
   user_id UUID NOT NULL,
   bid_amount DECIMAL NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  status TEXT CHECK (status IN ('pendente', 'aceito', 'rejeitado')) DEFAULT 'pendente',
+  status TEXT CHECK (status IN ('pendente', 'aceito', 'rejeitado', 'cancelado')) DEFAULT 'pendente',
   FOREIGN KEY (alert_id) REFERENCES product_alerts(alert_id),
   FOREIGN KEY (user_id) REFERENCES users_table(user_id)
 );`;
