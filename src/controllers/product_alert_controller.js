@@ -10,6 +10,20 @@ const getProductAlerts = async (req, res) => {
   }
 };
 
+const getConfirmedProductAlerts = async (req, res) => {
+  if (req.userType !== "cliente") {
+    try {
+      const productsAlert = await productAlertModel.getAllConfirmedBids(req.userId);
+
+      res.status(200).json({ data: productsAlert });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  } else {
+    res.status(403).json({ message: "Not authorized" });
+  }
+};
+
 const getProductAlert = async (req, res) => {
   if (req.userType === "cliente") {
     const { id } = req.params;
@@ -115,4 +129,5 @@ export default {
   addProductAlert,
   updateProductAlert,
   deleteProductAlert,
+  getConfirmedProductAlerts
 };
