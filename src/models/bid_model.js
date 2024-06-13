@@ -1,8 +1,11 @@
 import pool from "../config/db";
 
-const getAll = async () => {
+const getAll = async (id) => {
   try {
-    const bids = await pool.query("SELECT bids.*, u.nome_completo as supplier_name FROM bids JOIN users_table u ON u.user_id = bids.user_id");
+    const bids = await pool.query(
+      "SELECT bids.*, bids.user_id as supplier_id, u.nome_completo as supplier_name FROM bids JOIN users_table u ON u.user_id = bids.user_id WHERE alert_id = $1",
+      [id]
+    );
     return bids.rows;
   } catch (error) {
     console.log(error);
@@ -10,11 +13,10 @@ const getAll = async () => {
   }
 };
 
-
 const getOne = async (id) => {
   try {
     const bid = await pool.query(
-      "SELECT bids.*, user.nome_completo FROM bids JOIN user_table user ON user.user_id = bids.user_id WHERE user_id = $1",
+      "SELECT bids.*, u.nome_completo as supplier_name FROM bids JOIN users_table u ON u.user_id = bids.user_id WHERE bids.user_id = $1",
       [id]
     );
     return bid.rows;
@@ -45,10 +47,8 @@ const addBid = async (bid, userId) => {
   }
 };
 
-
 const cancelBid = async (bidId) => {
   try {
-
     const deletedBid = await pool.query(
       "UPDATE bids SET status = 'cancelado' WHERE bid_id = $1 RETURNING *",
       [bidId]
@@ -61,24 +61,24 @@ const cancelBid = async (bidId) => {
   }
 };
 
-const rejectBid = async (bidId) => {
-    try {
-      const deletedBid = await pool.query(
-        "UPDATE bids SET status = 'rejeitado' WHERE bid_id = $1 RETURNING *",
-        [bidId]
-      );
-  
-      return deletedBid.rows[0];
-    } catch (error) {
-      console.log(error);
-      return { error: error.message, severity: error.severity };
-    }
-  };
+const updateStatus = async (bidId, status) => {
+  try {
+    const deletedBid = await pool.query(
+      "UPDATE bids SET status = $1 WHERE bid_id = $2 RETURNING *",
+      [status, bidId]
+    );
+
+    return deletedBid.rows[0];
+  } catch (error) {
+    console.log(error);
+    return { error: error.message, severity: error.severity };
+  }
+};
 
 export default {
   getAll,
   getOne,
   addBid,
   cancelBid,
-  rejectBid
+  updateStatus,
 };
