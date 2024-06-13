@@ -2,7 +2,29 @@ import pool from "../config/db";
 
 const getAll = async () => {
   try {
-    const productAlerts = await pool.query("SELECT pa.*, p.product_name FROM product_alerts pa JOIN products p ON p.product_id = pa.product_Id");
+    const productAlerts = await pool.query(
+      `SELECT pa.*, p.product_name, u.telefone 
+      FROM product_alerts pa 
+      JOIN products p ON p.product_id = pa.product_Id
+      JOIN users_table u ON u.user_id = pa.user_id_created`
+    );
+    return productAlerts.rows;
+  } catch (error) {
+    console.log(error);
+    return { error: error.message, severity: error.severity };
+  }
+};
+
+const getAllConfirmedBids = async (userId) => {
+  try {
+    const productAlerts = await pool.query(
+      `SELECT pa.*, p.product_name, u.telefone 
+      FROM product_alerts pa 
+      JOIN products p ON p.product_id = pa.product_Id
+      JOIN users_table u ON u.user_id = pa.user_id_created
+      WHERE user_id_assigned = $1`,
+      [userId]
+    );
     return productAlerts.rows;
   } catch (error) {
     console.log(error);
@@ -48,19 +70,18 @@ const updateProductAlert = async (prodcutAlertId, productAlert, userId) => {
   const { productId, quantity, description, negociation } = productAlert;
 
   try {
-    const updatedProduct = await pool.query(
+    const updatedProductAlert = await pool.query(
       `UPDATE product_alerts 
        SET product_id = $1 , quantity_needed = $2, description = $3, negotiation_deadline = $4, user_id_created = $5 
        WHERE alert_id = $6 RETURNING *`,
       [productId, quantity, description, negociation, userId, prodcutAlertId]
     );
 
-    if (!updatedProduct.severity) {
-      return updatedProduct.rows[0];
-    }else{
-        throw new Error(updatedProduct.error)
+    if (!updatedProductAlert.severity) {
+      return updatedProductAlert.rows[0];
+    } else {
+      throw new Error(updatedProductAlert.error);
     }
-
   } catch (error) {
     console.log(error);
     return { error: error.message, severity: error.severity };
@@ -69,12 +90,26 @@ const updateProductAlert = async (prodcutAlertId, productAlert, userId) => {
 
 const deleteProductAlert = async (productAlertId) => {
   try {
-    const deletedProduct = await pool.query(
+    const deletedProductAlert = await pool.query(
       "UPDATE product_alerts SET status = 'cancelado' WHERE alert_id = $1 RETURNING *",
       [productAlertId]
     );
 
-    return deletedProduct.rows[0];
+    return deletedProductAlert.rows[0];
+  } catch (error) {
+    console.log(error);
+    return { error: error.message, severity: error.severity };
+  }
+};
+
+const confirmProductAlert = async (productAlertId, supllierId) => {
+  try {
+    const confirmedAlert = await pool.query(
+      "UPDATE product_alerts SET status = 'concluído', user_id_assigned = $1 WHERE alert_id = $2 RETURNING *",
+      [supllierId, productAlertId]
+    );
+
+    return confirmedAlert.rows[0];
   } catch (error) {
     console.log(error);
     return { error: error.message, severity: error.severity };
@@ -87,4 +122,6 @@ export default {
   addProductAlert,
   updateProductAlert,
   deleteProductAlert,
+  confirmProductAlert,
+  getAllConfirmedBids
 };
