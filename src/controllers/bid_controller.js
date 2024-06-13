@@ -1,8 +1,10 @@
 import bidModel from "../models/bid_model";
+import producAlertModel from "../models/product_alert_model";
 
 const getBids = async (req, res) => {
+  const { id } = req.params;
   try {
-    const bids = await bidModel.getAll();
+    const bids = await bidModel.getAll(id);
 
     res.status(200).json({ data: bids });
   } catch (error) {
@@ -11,30 +13,25 @@ const getBids = async (req, res) => {
 };
 
 const getBid = async (req, res) => {
-    const userId = req.userId
+  const userId = req.userId;
 
-    try {
+  try {
+    const bid = await bidModel.getOne(userId);
 
-      const bid = await bidModel.getOne(userId);
-
-      if (bid) {
-        res.status(200).json({ data: bid });
-      } else {
-        res.status(404).json({ message: "Bid not found" });
-      }
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    if (bid) {
+      res.status(200).json({ data: bid });
+    } else {
+      res.status(404).json({ message: "Bid not found" });
     }
-
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const addBid = async (req, res) => {
   if (req.userType !== "cliente") {
     try {
-      const bid = await bidModel.addBid(
-        req.body,
-        req.userId
-      );
+      const bid = await bidModel.addBid(req.body, req.userId);
 
       if (!bid.error) {
         res.status(200).json({ data: bid });
@@ -48,7 +45,6 @@ const addBid = async (req, res) => {
     res.status(403).json({ message: "Not authorized" });
   }
 };
-
 
 const cancelBid = async (req, res) => {
   if (req.userType !== "cliente") {
@@ -68,7 +64,6 @@ const cancelBid = async (req, res) => {
 
       res.status(200).json({ message: "Bid canceled successfully" });
     } catch (error) {
-
       res.status(500).json({ error: error.message });
     }
   } else {
@@ -76,34 +71,54 @@ const cancelBid = async (req, res) => {
   }
 };
 
-const rejectBid= async (req, res) => {
-    if (req.userType === "cliente") {
-      const { id } = req.params;
-  
-      try {
-        if (!id) {
-          throw new Error("Id is required");
-        }
-  
-        const rejectedBid = await bidModel.rejectBid(id);
-  
-        if (rejectedBid.error) {
-          throw new Error(rejectedBid.error);
-        }
-  
-        res.status(200).json({ message: "Bid rejected successfully" });
-      } catch (error) {
-        res.status(500).json({ error: error.message });
+const updateStatus = async (req, res) => {
+  if (req.userType === "cliente") {
+    const { id } = req.params;
+    const { status, alertId, supllierId } = req.body;
+
+    try {
+      if (!id) {
+        throw new Error("Id is required");
       }
-    } else {
-      res.status(403).json({ message: "Not authorized" });
+
+      if (status == "aceito") {
+        const updatedBid = await bidModel.updateStatus(id, status);
+
+        if (updatedBid.error) {
+          throw new Error(updatedBid.error);
+        }
+
+        const updatedProductAlert = await producAlertModel.confirmProductAlert(
+          alertId,
+          supllierId
+        );
+
+        if (updatedProductAlert.error) {
+          throw new Error(updatedProductAlert.error);
+        }
+
+        res.status(200).json({ message: "Bid status successfully updated" });
+      } else {
+        const updatedBid = await bidModel.updateStatus(id, status);
+
+        if (updatedBid.error) {
+          throw new Error(updatedBid.error);
+        }
+
+        res.status(200).json({ message: "Bid status successfully updated" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-  };
+  } else {
+    res.status(403).json({ message: "Not authorized" });
+  }
+};
 
 export default {
   getBids,
   getBid,
   addBid,
   cancelBid,
-  rejectBid
+  updateStatus,
 };
