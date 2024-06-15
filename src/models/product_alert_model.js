@@ -6,7 +6,8 @@ const getAll = async () => {
       `SELECT pa.*, p.product_name, u.telefone 
       FROM product_alerts pa 
       JOIN products p ON p.product_id = pa.product_Id
-      JOIN users_table u ON u.user_id = pa.user_id_created`
+      JOIN users_table u ON u.user_id = pa.user_id_created
+      ORDER BY created_at DESC`
     );
     return productAlerts.rows;
   } catch (error) {
@@ -22,7 +23,8 @@ const getAllConfirmedBids = async (userId) => {
       FROM product_alerts pa 
       JOIN products p ON p.product_id = pa.product_Id
       JOIN users_table u ON u.user_id = pa.user_id_created
-      WHERE user_id_assigned = $1`,
+      WHERE user_id_assigned = $1
+      ORDER BY created_at DESC`,
       [userId]
     );
     return productAlerts.rows;
