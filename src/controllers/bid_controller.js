@@ -74,7 +74,7 @@ const cancelBid = async (req, res) => {
 const updateStatus = async (req, res) => {
   if (req.userType === "cliente") {
     const { id } = req.params;
-    const { status, alertId, supllierId } = req.body;
+    const { status, alertId, supplierId } = req.body;
 
     try {
       if (!id) {
@@ -90,7 +90,7 @@ const updateStatus = async (req, res) => {
 
         const updatedProductAlert = await producAlertModel.confirmProductAlert(
           alertId,
-          supllierId
+          supplierId
         );
 
         if (updatedProductAlert.error) {

@@ -104,11 +104,12 @@ const deleteProductAlert = async (productAlertId) => {
   }
 };
 
-const confirmProductAlert = async (productAlertId, supllierId) => {
+const confirmProductAlert = async (productAlertId, supplierId) => {
   try {
+
     const confirmedAlert = await pool.query(
       "UPDATE product_alerts SET status = 'concluído', user_id_assigned = $1 WHERE alert_id = $2 RETURNING *",
-      [supllierId, productAlertId]
+      [supplierId, productAlertId]
     );
 
     return confirmedAlert.rows[0];
