@@ -16,6 +16,23 @@ const getAll = async () => {
   }
 };
 
+const getAllByUser = async (id) => {
+  try {
+    const productAlerts = await pool.query(
+      `SELECT pa.*, p.product_name, u.telefone 
+      FROM product_alerts pa 
+      JOIN products p ON p.product_id = pa.product_Id
+      JOIN users_table u ON u.user_id = pa.user_id_created
+      WHERE user_id_created = $1
+      ORDER BY created_at DESC`, [id]
+    );
+    return productAlerts.rows;
+  } catch (error) {
+    console.log(error);
+    return { error: error.message, severity: error.severity };
+  }
+};
+
 const getAllConfirmedBids = async (userId) => {
   try {
     const productAlerts = await pool.query(
@@ -121,6 +138,7 @@ const confirmProductAlert = async (productAlertId, supplierId) => {
 
 export default {
   getAll,
+  getAllByUser,
   getOne,
   addProductAlert,
   updateProductAlert,

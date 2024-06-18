@@ -1,19 +1,32 @@
 import productAlertModel from "../models/product_alert_model";
 
 const getProductAlerts = async (req, res) => {
-  try {
-    const productsAlert = await productAlertModel.getAll();
+  if (req.userType !== "cliente") {
+    try {
+      const productsAlert = await productAlertModel.getAll();
 
-    res.status(200).json({ data: productsAlert });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+      res.status(200).json({ data: productsAlert });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  } else {
+    const id = req.userId;
+    try {
+      const productsAlert = await productAlertModel.getAllByUser(id);
+
+      res.status(200).json({ data: productsAlert });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
 };
 
 const getConfirmedProductAlerts = async (req, res) => {
   if (req.userType !== "cliente") {
     try {
-      const productsAlert = await productAlertModel.getAllConfirmedBids(req.userId);
+      const productsAlert = await productAlertModel.getAllConfirmedBids(
+        req.userId
+      );
 
       res.status(200).json({ data: productsAlert });
     } catch (error) {
@@ -129,5 +142,5 @@ export default {
   addProductAlert,
   updateProductAlert,
   deleteProductAlert,
-  getConfirmedProductAlerts
+  getConfirmedProductAlerts,
 };
