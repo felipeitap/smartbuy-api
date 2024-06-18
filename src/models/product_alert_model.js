@@ -23,7 +23,7 @@ const getAllByUser = async (id) => {
       FROM product_alerts pa 
       JOIN products p ON p.product_id = pa.product_Id
       JOIN users_table u ON u.user_id = pa.user_id_created
-      WHERE user_id_created = $1
+      WHERE pa.user_id_created = $1
       ORDER BY created_at DESC`, [id]
     );
     return productAlerts.rows;
