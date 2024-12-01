@@ -30,11 +30,16 @@ const getBid = async (req, res) => {
 
 const addBid = async (req, res) => {
   if (req.userType !== "cliente") {
+    const { clientId, productName, alertId } = req.body;
+    const io = req.app.get("io");
     try {
       const bid = await bidModel.addBid(req.body, req.userId);
 
       if (!bid.error) {
         res.status(200).json({ data: bid });
+        io.to(clientId).emit("new_bid", {
+          message: `Nova proposta adicionada ao seu alerta: ${productName}`,
+        });
       } else {
         throw new Error(bid.error);
       }
@@ -75,6 +80,7 @@ const updateStatus = async (req, res) => {
   if (req.userType === "cliente") {
     const { id } = req.params;
     const { status, alertId, supplierId } = req.body;
+    const io = req.app.get("io");
 
     try {
       if (!id) {
@@ -98,6 +104,9 @@ const updateStatus = async (req, res) => {
         }
 
         res.status(200).json({ message: "Bid status successfully updated" });
+        io.to(supplierId).emit("bid_accepted", {
+          message: `Uma proposta sua foi aceita`,
+        });
       } else {
         const updatedBid = await bidModel.updateStatus(id, status);
 
