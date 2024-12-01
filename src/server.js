@@ -30,6 +30,6 @@ io.on("connection", (socket) => {
 
 app.set("io", io);
 
-server.listen(process.env.PORT, "192.168.1.7", () => {
+server.listen(process.env.PORT, () => {
   console.log(`Server Running on ${process.env.PORT}`);
 });
