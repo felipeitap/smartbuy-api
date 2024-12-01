@@ -8,9 +8,7 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: 5432,
-  ssl: {
-    rejectUnauthorized: false, 
-  }
+  ssl: false
 });
 
 const createExtension = 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";';
@@ -69,6 +67,7 @@ const createBidTableQuery = `CREATE TABLE IF NOT EXISTS bids (
   alert_id UUID NOT NULL,
   user_id UUID NOT NULL,
   bid_amount DECIMAL NOT NULL,
+  delivery_date DATE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   status TEXT CHECK (status IN ('pendente', 'aceito', 'rejeitado', 'cancelado')) DEFAULT 'pendente',
   FOREIGN KEY (alert_id) REFERENCES product_alerts(alert_id),
