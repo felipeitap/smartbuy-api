@@ -38,31 +38,28 @@ const getConfirmedProductAlerts = async (req, res) => {
 };
 
 const getProductAlert = async (req, res) => {
-  if (req.userType === "cliente") {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    try {
-      if (!id) {
-        throw new Error("Id is required");
-      }
-
-      const productAlert = await productAlertModel.getOne(id);
-
-      if (productAlert) {
-        res.status(200).json({ data: productAlert });
-      } else {
-        res.status(404).json({ message: "Product Alert not found" });
-      }
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  try {
+    if (!id) {
+      throw new Error("Id is required");
     }
-  } else {
-    res.status(403).json({ message: "Not authorized" });
+
+    const productAlert = await productAlertModel.getOne(id);
+
+    if (productAlert) {
+      res.status(200).json({ data: productAlert });
+    } else {
+      res.status(404).json({ message: "Product Alert not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
 const addProductAlert = async (req, res) => {
   if (req.userType === "cliente") {
+    const io = req.app.get("io")
     try {
       const productAlert = await productAlertModel.addProductAlert(
         req.body,
@@ -71,6 +68,7 @@ const addProductAlert = async (req, res) => {
 
       if (!productAlert.error) {
         res.status(200).json({ data: productAlert });
+        io.to("fornecedor").emit("new_alert", {message: "Novo alerta disponível"})
       } else {
         throw new Error(productAlert.error);
       }
