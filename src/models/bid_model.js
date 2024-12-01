@@ -3,7 +3,10 @@ import pool from "../config/db";
 const getAll = async (id) => {
   try {
     const bids = await pool.query(
-      "SELECT bids.*, bids.user_id as supplier_id, u.nome_completo as supplier_name FROM bids JOIN users_table u ON u.user_id = bids.user_id WHERE alert_id = $1",
+      `SELECT bids.*, bids.user_id as supplier_id, u.nome_completo as supplier_name 
+      FROM bids JOIN users_table u ON u.user_id = bids.user_id 
+      WHERE alert_id = $1
+      ORDER BY status`,
       [id]
     );
     return bids.rows;
@@ -27,13 +30,13 @@ const getOne = async (id) => {
 };
 
 const addBid = async (bid, userId) => {
-  const { alertId, bidValue } = bid;
+  const { alertId, bidValue, delivery } = bid;
 
   try {
     const newProductAlert = await pool.query(
-      `INSERT INTO bids (alert_id , bid_amount, user_id)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [alertId, bidValue, userId]
+      `INSERT INTO bids (alert_id , bid_amount, user_id, delivery_date)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [alertId, bidValue, userId, delivery]
     );
 
     if (!newProductAlert.severity) {
