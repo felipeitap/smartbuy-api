@@ -19,12 +19,31 @@ const getAll = async () => {
 const getAllByUser = async (id) => {
   try {
     const productAlerts = await pool.query(
-      `SELECT pa.*, p.product_name, u.telefone 
-      FROM product_alerts pa 
-      JOIN products p ON p.product_id = pa.product_Id
-      JOIN users_table u ON u.user_id = pa.user_id_created
-      WHERE pa.user_id_created = $1
-      ORDER BY created_at DESC`, [id]
+      `SELECT 
+        pa.*, 
+        p.product_name, 
+        u.telefone,
+        COUNT(b.bid_id) AS total_bids
+    FROM 
+        product_alerts pa
+    JOIN 
+        products p 
+        ON p.product_id = pa.product_Id
+    JOIN 
+        users_table u 
+        ON u.user_id = pa.user_id_created
+    LEFT JOIN 
+        bids b 
+        ON b.alert_id = pa.alert_id
+    WHERE 
+        pa.user_id_created = $1
+    GROUP BY 
+        pa.alert_id, 
+        p.product_name, 
+        u.telefone
+    ORDER BY 
+    pa.created_at DESC;`,
+      [id]
     );
     return productAlerts.rows;
   } catch (error) {
@@ -123,7 +142,6 @@ const deleteProductAlert = async (productAlertId) => {
 
 const confirmProductAlert = async (productAlertId, supplierId) => {
   try {
-
     const confirmedAlert = await pool.query(
       "UPDATE product_alerts SET status = 'concluído', user_id_assigned = $1 WHERE alert_id = $2 RETURNING *",
       [supplierId, productAlertId]
@@ -144,5 +162,5 @@ export default {
   updateProductAlert,
   deleteProductAlert,
   confirmProductAlert,
-  getAllConfirmedBids
+  getAllConfirmedBids,
 };
